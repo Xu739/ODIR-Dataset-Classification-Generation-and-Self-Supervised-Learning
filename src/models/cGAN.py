@@ -55,21 +55,21 @@ class netD(nn.Module):
     def __init__(self, nz=100, n_classes=8, ndf=64, nc=3):
         # 判别器             #(N,nc, 128,128)
         super(netD, self).__init__()
-        self.model = nn.Sequential(nn.Conv2d(nc + n_classes, ndf * 2, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 2),
+        self.model = nn.Sequential(nn.Conv2d(nc + n_classes, ndf * 2, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 2),#/2
                              nn.LeakyReLU(0.2, inplace=True),
-                             nn.Conv2d(ndf * 2, ndf * 2, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 2),
+                             nn.Conv2d(ndf * 2, ndf * 2, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 2),#4
                              nn.LeakyReLU(0.2, inplace=True),
-                             nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 4),
+                             nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 4),#8
                              nn.LeakyReLU(0.2, inplace=True),
-                             nn.Conv2d(ndf * 4, ndf * 4, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 4),
+                             nn.Conv2d(ndf * 4, ndf * 4, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 4),#16
                              nn.LeakyReLU(0.2, inplace=True),
-                             nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 8),
+                             nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False), nn.BatchNorm2d(ndf * 8),#32
                              nn.LeakyReLU(0.2, inplace=True),
-                             nn.Conv2d(ndf * 8, ndf * 16, 4, 1, 0, bias=False),  # (N,1,1,1)
+                             nn.Conv2d(ndf * 8, ndf * 16, 4, 2, 1, bias=False),  # (N,64*16,4,4）
                              nn.LeakyReLU(0.2, inplace=True),
                              nn.Conv2d(ndf * 16, 1, 4, 1, 0, bias=False),
                              nn.Flatten(),  # (N,1)
-                             nn.Linear(4,1),
+                             # nn.Linear(1,1),
                              nn.Sigmoid()
                              )
 

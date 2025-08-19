@@ -164,25 +164,44 @@ def GetDataset(par, data_type, transform=None):
 
 import torchvision.transforms as T
 
-def GetTransform(par, type):
+def GetTransform(par, type,is_generation=False):
 
-    if type == 'train':
-        transforms = T.Compose([
-            T.Resize((256, 256)),
-            T.RandomRotation(30),
-            T.RandomHorizontalFlip(),
-            T.RandomVerticalFlip(),
-            T.ColorJitter(brightness=0.2, contrast=0.2),
-            T.RandomResizedCrop(224, scale=(0.8, 1.0)),
-            T.ToTensor(),
-            T.Normalize([0.5] * 3, [0.5] * 3)
-        ])
+    if is_generation:
+        if type == 'train':
+            transforms = T.Compose([
+                T.Resize((256, 256)),
+                T.RandomRotation(30),
+                T.RandomHorizontalFlip(),
+                T.RandomVerticalFlip(),
+                T.ColorJitter(brightness=0.2, contrast=0.2),
+
+                T.ToTensor(),
+                T.Normalize([0.5] * 3, [0.5] * 3)
+            ])
+        else:
+            transforms = T.Compose([
+                T.Resize((256, 256)),
+                T.ToTensor(),
+                T.Normalize([0.5] * 3, [0.5] * 3)
+            ])
     else:
-        transforms = T.Compose([
-            T.Resize((224, 224)),
-            T.ToTensor(),
-            T.Normalize([0.5] * 3, [0.5] * 3)
-        ])
+        if type == 'train':
+            transforms = T.Compose([
+                T.Resize((256, 256)),
+                T.RandomRotation(30),
+                T.RandomHorizontalFlip(),
+                T.RandomVerticalFlip(),
+                T.ColorJitter(brightness=0.2, contrast=0.2),
+                T.RandomResizedCrop(224, scale=(0.8, 1.0)),
+                T.ToTensor(),
+                T.Normalize([0.5] * 3, [0.5] * 3)
+            ])
+        else:
+            transforms = T.Compose([
+                T.Resize((224, 224)),
+                T.ToTensor(),
+                T.Normalize([0.5] * 3, [0.5] * 3)
+            ])
     return transforms
 
 

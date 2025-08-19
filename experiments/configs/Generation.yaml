@@ -1,5 +1,5 @@
 # Model Configuration
-model: 'cGAN'  # Model type, choices: ['cGAN', 'DDIM', 'cGANmlp']
+model: 'cGAN'  # Model type, choices: ['cGAN', 'DDIM',]
 CUDA_VISIBLE_DEVICES: '5'  # GPU device ID to use
 
 # Dataset Paths
@@ -20,6 +20,7 @@ is_oversample: 0  # Whether to use oversampling (0=False, 1=True)
 # cGAN-specific Parameters
 latent_dim: 100  # Dimension of latent space/noise vector
 num_classes: 8  # Number of output classes
+criterion: 'BCELoss'#Criterion type, choices: ['BCELoss']
 
 # DDIM-specific Parameters (Diffusion Models)
 T: 1000  # Number of diffusion timesteps

@@ -129,6 +129,8 @@ def GetCriterion(par, class_weights):
             return nn.CrossEntropyLoss(weight=torch.tensor(class_weights, dtype=torch.float))
         else:
             return nn.CrossEntropyLoss()
+    elif par.criterion == 'BCELoss':
+        return nn.BCELoss()
     else:
         return None
 
