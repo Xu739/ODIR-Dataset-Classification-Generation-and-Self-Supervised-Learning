@@ -1,0 +1,23 @@
+# 数据和模型太大，不上传
+data/
+checkpoints/
+experiments/logs/
+*.pt
+*.pth
+*.ckpt
+
+!data/*.py
+!data/*.md
+
+# 编译后的中间文件
+__pycache__/
+*.pyc
+*.pyo
+
+# LaTeX中间文件
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
