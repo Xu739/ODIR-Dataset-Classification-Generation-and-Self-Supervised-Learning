@@ -1,12 +1,12 @@
 # Model Configuration
-model: 'ResNet50'  # Options: ['ResNet18', 'ResNet50', 'EfficientNet_b0', 'ViT', 'ResNet101', 'VGG19', 'GoogleNet']
+model: 'ViT'  # Options: ['ResNet18', 'ResNet50', 'EfficientNet_b3', 'ViT', 'ResNet101', 'VGG19', 'GoogleNet']
 img_size: 224             # Input image size (height, width)
 
 # Dataset Configuration
 datafile_path: './data'   # Root directory for data files
 img_path: './data/ODIR/ODIR-5K/Training Images'  # Path to training images
-dataset: 'ODIR'           # Options: ['cifar-10', 'ODIR']
-num_classes: 8           # Number of output classes
+dataset: 'cifar-10'           # Options: ['cifar-10', 'ODIR','mnist']
+num_classes: 10           # Number of output classes
 
 # Data Splitting
 split_num: 5              # Total number of folds for cross-validation
@@ -38,6 +38,6 @@ epochs: 300               # Total number of training epochs
 criterion: 'CrossEntropyLoss'  # Loss function
 
 # System Configuration
-CUDA_VISIBLE_DEVICES: '1,'  # GPU devices to use (comma-separated)
+CUDA_VISIBLE_DEVICES: '3,'  # GPU devices to use (comma-separated)
 seed: 42                   # Random seed for reproducibility
-earlystop: 1              # Early stopping patience (epochs)
+earlystop: 50              # Early stopping patience (epochs)
