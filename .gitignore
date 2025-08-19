@@ -1,5 +1,5 @@
 # 数据和模型太大，不上传
-data/
+data/*
 checkpoints/
 experiments/logs/
 *.pt
