@@ -10,6 +10,7 @@ experiments/logs/
 
 !data/*.py
 !data/*.md
+!data/*.sh
 
 # 编译后的中间文件
 __pycache__/
@@ -23,3 +24,5 @@ __pycache__/
 *.toc
 *.bbl
 *.blg
+
+.idea
