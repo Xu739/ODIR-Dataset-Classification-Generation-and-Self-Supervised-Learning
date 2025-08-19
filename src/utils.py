@@ -294,3 +294,40 @@ def RotSSP(train_dataloader, val_dataloader, save_dir, par):
             return checkpoint_path
 
     return None
+
+
+# import numpy as np
+# import torch
+from scipy import linalg
+# from torch import nn
+from torchvision.models import inception_v3
+
+# 载入 InceptionV3
+def get_inception_model(device):
+    model = inception_v3(pretrained=True, transform_input=False)
+    model.fc = nn.Identity()  # 去掉最后的分类层
+    model.eval()
+    model.to(device)
+    return model
+
+# 提取特征
+def get_features(dataloader, model, device, max_batches=None):
+    features = []
+    for i, (x, _) in enumerate(dataloader):
+        x = x.to(device)
+        with torch.no_grad():
+            feat = model(x)[0] if isinstance(model(x), tuple) else model(x)
+        features.append(feat.cpu().numpy())
+        if max_batches and i >= max_batches:
+            break
+    features = np.concatenate(features, axis=0)
+    return features
+
+# FID 计算
+def calculate_fid(mu1, sigma1, mu2, sigma2, eps=1e-6):
+    diff = mu1 - mu2
+    covmean, _ = linalg.sqrtm(sigma1.dot(sigma2), disp=False)
+    if not np.isfinite(covmean).all():
+        covmean = covmean.real
+    return diff.dot(diff) + np.trace(sigma1 + sigma2 - 2 * covmean)
+

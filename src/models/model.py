@@ -4,6 +4,7 @@ from models.VGG import vgg19
 from models.EfficientNet import efficientnet_b0, efficientnet_b1, efficientnet_b2, efficientnet_b3
 from models.ViT import vit_base_patch16_224
 
+
 from src.models.cGAN import cGAN
 
 
@@ -30,4 +31,7 @@ def GetModel(par,num_classes=None):
 
     elif par.model == 'cGAN':
         model = cGAN(par.latent_dim,par.num_classes,64,64,3 if par.dataset in ['cifar-10','ODIR'] else 1)
+    elif par.model == 'ddim':
+        from models.ddim import UNet
+        model = UNet(par,3 if par.dataset in ['cifar-10','ODIR'] else 1,num_classes=par.num_classes)
     return model

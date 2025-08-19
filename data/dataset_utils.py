@@ -167,23 +167,42 @@ import torchvision.transforms as T
 def GetTransform(par, type,is_generation=False):
 
     if is_generation:
-        if type == 'train':
-            transforms = T.Compose([
-                T.Resize((256, 256)),
-                T.RandomRotation(30),
-                T.RandomHorizontalFlip(),
-                T.RandomVerticalFlip(),
-                T.ColorJitter(brightness=0.2, contrast=0.2),
+        if par.model == 'ddim':
+            if type == 'train':
+                transforms = T.Compose([
+                    T.Resize((128, 128)),
+                    T.RandomRotation(30),
+                    T.RandomHorizontalFlip(),
+                    T.RandomVerticalFlip(),
+                    T.ColorJitter(brightness=0.2, contrast=0.2),
 
-                T.ToTensor(),
-                T.Normalize([0.5] * 3, [0.5] * 3)
-            ])
+                    T.ToTensor(),
+                    T.Normalize([0.5] * 3, [0.5] * 3)
+                ])
+            else:
+                transforms = T.Compose([
+                    T.Resize((128, 128)),
+                    T.ToTensor(),
+                    T.Normalize([0.5] * 3, [0.5] * 3)
+                ])
         else:
-            transforms = T.Compose([
-                T.Resize((256, 256)),
-                T.ToTensor(),
-                T.Normalize([0.5] * 3, [0.5] * 3)
-            ])
+            if type == 'train':
+                transforms = T.Compose([
+                    T.Resize((256, 256)),
+                    T.RandomRotation(30),
+                    T.RandomHorizontalFlip(),
+                    T.RandomVerticalFlip(),
+                    T.ColorJitter(brightness=0.2, contrast=0.2),
+
+                    T.ToTensor(),
+                    T.Normalize([0.5] * 3, [0.5] * 3)
+                ])
+            else:
+                transforms = T.Compose([
+                    T.Resize((256, 256)),
+                    T.ToTensor(),
+                    T.Normalize([0.5] * 3, [0.5] * 3)
+                ])
     else:
         if type == 'train':
             transforms = T.Compose([

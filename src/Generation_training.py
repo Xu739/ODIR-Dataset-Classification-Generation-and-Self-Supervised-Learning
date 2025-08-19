@@ -12,6 +12,9 @@ from matplotlib import pyplot as plt
 from sklearn.preprocessing import LabelBinarizer
 from torch import nn, optim
 import yaml
+from torchvision import utils
+
+
 global device
 
 os.environ["WANDB_MODE"] = "offline"
@@ -22,14 +25,63 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 os.chdir(root_dir)
 print(root_dir)
 from src.models.model import GetModel
-
+from src.models.ddim import q_sample, compute_fid, sample_ddim_cfg, linear_beta_schedule
 from experiments.configs.par import Struct
 from src.utils import GetCriterion,GetOptim
 
 from data.dataset_utils import GetDataset, GetTransform
+def train_ddim_cfg(model, train_dataloader, val_dataloader, par, save_dir, device):
+    betas = linear_beta_schedule(par.T)
+    alphas = 1.0 - betas
+    alphas_cumprod = torch.cumprod(alphas, axis=0).to(device)
+    optimizer, scheduler = GetOptim(par, model)
+    mse = nn.MSELoss()
+
+    start_epoch = 0
+    if par.is_resume:
+        path = f'/home/xukaijie/zju/checkpoints_ddim/model_epoch_{par.start_epoch}.pt'
+        state = torch.load(path)
+        model.load_state_dict(state)
+        start_epoch = par.start_epoch
+
+    for epoch in range(start_epoch,par.epochs):
+        for step, (x, y) in enumerate(train_dataloader):
+            x = x.to(device)
+            y = y.to(device)
+
+            if torch.rand(1).item() < par.drop_prob:
+                y = None
+
+            b = x.shape[0]
+            t = torch.randint(0, par.T, (b,), device=device).long()
+            noise = torch.randn_like(x).to(device)
+            x_t = q_sample(x, t, noise,alphas_cumprod)
+
+            t_norm = t.float() / par.T
+            pred = model(x_t.float(), t_norm.float().to(device), y)
+
+            loss = mse(pred, noise)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            if step % 50 == 0:
+                print(f"Epoch {epoch} Step {step} Loss {loss.item():.4f}")
+        scheduler.step()
+                # 保存 checkpoint
+        ckpt_path = os.path.join(save_dir, f"model_epoch_{epoch}.pt")
+        torch.save(model.state_dict(), ckpt_path)
+        # 训练结束后
+        fid_score = compute_fid(model, train_dataloader, device,par, n_samples=2000)
+        print("FID:", fid_score)
+        # 每个 epoch 自动采样
+        for label in range(8):
+            samples = sample_ddim_cfg(model, label,par,device,alphas, alphas_cumprod,n_samples=8, sample_steps=50)
+            utils.save_image(samples, os.path.join(save_dir, f"samples_epoch_{epoch}_{label}.png"), nrow=4)
+        print(f"[INFO] Epoch {epoch} checkpoint & samples saved.")
 
 
-def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir):
+def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
     # real label
     real_label = 1.0
     # fake label
@@ -178,7 +230,7 @@ if __name__ == '__main__':
     # Create save directory for checkpoints
     save_dir = f'./experiments/log/{datetime.now().strftime("%Y%m%d-%H%M%S")}/'
     os.makedirs(save_dir, exist_ok=True)
-    subprocess.call(f'cp ./experiments/configs/Classification.yaml {save_dir}', shell=True)  # Save config
+    subprocess.call(f'cp ./experiments/configs/Generation.yaml {save_dir}', shell=True)  # Save config
 
     global device
 
@@ -204,5 +256,6 @@ if __name__ == '__main__':
     # print(model)
 
     if par.model in ['cGAN']:
-        train_cGAN(model, train_dataloader, val_dataloader, par, save_dir)
-
+        train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device)
+    elif par.model in ['ddim']:
+        train_ddim_cfg(model.to(device), train_dataloader, val_dataloader, par, save_dir, device)
