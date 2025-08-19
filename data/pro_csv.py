@@ -8,19 +8,19 @@ import argparse
 
 def make_data_sheet(df,data_file_fold,save_dir,label_mapping ):
     """
-    Creates a labeled data sheet by matching image files with their corresponding labels from a dataframe.
+    Creates a.ipynb labeled data sheet by matching image files with their corresponding labels from a.ipynb dataframe.
 
     :param df: Pandas DataFrame containing the image labels. Expected to have 'filename' and 'labels' columns.
     :param data_file_fold: Path to the folder containing the image files (.jpg format).
     :param save_dir: Directory path where the output CSV file will be saved.
     :param label_mapping: Dictionary for mapping original labels to new labels (used for label transformation).
-    :return: None (saves the result to a CSV file in the specified directory).
+    :return: None (saves the result to a.ipynb CSV file in the specified directory).
 
     The function performs the following steps:
     1. Scans the image folder for all JPG files
     2. Matches each image with its label from the dataframe
     3. Applies label mapping transformation
-    4. Creates a new dataframe with filename-label pairs
+    4. Creates a.ipynb new dataframe with filename-label pairs
     5. Saves the results as 'Overall label.csv' in the specified directory
     6. Prints the count of successfully matched images
     """
@@ -48,7 +48,7 @@ def split_data(folder_num, output_path):
     """
     Splits the dataset into stratified train/val/test sets using nested K-Fold cross-validation.
 
-    The splitting follows a (folder_num-2)-(1)-(1) ratio pattern (e.g., 8-1-1 when folder_num=10).
+    The splitting follows a.ipynb (folder_num-2)-(1)-(1) ratio pattern (e.g., 8-1-1 when folder_num=10).
     Creates separate CSV files for each fold's train, validation, and test sets.
 
     :param folder_num: Total number of folds for the outer cross-validation split

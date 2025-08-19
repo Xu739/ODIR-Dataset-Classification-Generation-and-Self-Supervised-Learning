@@ -1,12 +1,12 @@
 # Model Configuration
-model: 'EfficientNet_b0'  # Options: ['ResNet18', 'ResNet50', 'EfficientNet_b0', 'ViT', 'ResNet101', 'VGG19', 'GoogleNet']
-img_size: 256             # Input image size (height, width)
+model: 'ResNet50'  # Options: ['ResNet18', 'ResNet50', 'EfficientNet_b0', 'ViT', 'ResNet101', 'VGG19', 'GoogleNet']
+img_size: 224             # Input image size (height, width)
 
 # Dataset Configuration
 datafile_path: './data'   # Root directory for data files
 img_path: './data/ODIR/ODIR-5K/Training Images'  # Path to training images
 dataset: 'ODIR'           # Options: ['cifar-10', 'ODIR']
-num_classes: 10           # Number of output classes
+num_classes: 8           # Number of output classes
 
 # Data Splitting
 split_num: 5              # Total number of folds for cross-validation
@@ -18,8 +18,8 @@ num_workers: 32           # Number of workers for data loading
 is_oversample: 0          # Whether to use oversampling for class imbalance (0/1)
 
 # Special Training Modes
-is_SSP: 0                 # Self-supervised pretraining flag (0/1)
-is_cifar_10: 0            # CIFAR-10 specific flag (0/1)
+is_RotSSP: 0                 # Self-supervised pretraining flag (0/1)
+is_cifar_10: 0            # use CIFAR-10 pretrain specific flag (0/1)
 cifar_10_state_dir: '/home/xukaijie/zju/results/20250814-164246/checkpoint_106.pth'  # Pretrained model path
 
 # Optimization Parameters
@@ -38,6 +38,6 @@ epochs: 300               # Total number of training epochs
 criterion: 'CrossEntropyLoss'  # Loss function
 
 # System Configuration
-CUDA_VISIBLE_DEVICES: '2,'  # GPU devices to use (comma-separated)
+CUDA_VISIBLE_DEVICES: '1,'  # GPU devices to use (comma-separated)
 seed: 42                   # Random seed for reproducibility
-earlystop: 50              # Early stopping patience (epochs)
+earlystop: 1              # Early stopping patience (epochs)

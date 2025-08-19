@@ -161,6 +161,29 @@ def GetDataset(par, data_type, transform=None):
 
     return dataset, dataloader
 
+import torchvision.transforms as T
+
+def GetTransform(par, type):
+
+    if type == 'train':
+        transforms = T.Compose([
+            T.Resize((256, 256)),
+            T.RandomRotation(30),
+            T.RandomHorizontalFlip(),
+            T.RandomVerticalFlip(),
+            T.ColorJitter(brightness=0.2, contrast=0.2),
+            T.RandomResizedCrop(224, scale=(0.8, 1.0)),
+            T.ToTensor(),
+            T.Normalize([0.5] * 3, [0.5] * 3)
+        ])
+    else:
+        transforms = T.Compose([
+            T.Resize((224, 224)),
+            T.ToTensor(),
+            T.Normalize([0.5] * 3, [0.5] * 3)
+        ])
+    return transforms
+
 
 if __name__ == '__main__':
     #change dir to root dir
@@ -174,7 +197,8 @@ if __name__ == '__main__':
     par_dir = './experiments/configs/Classification.yaml'
     par = yaml.safe_load(open(par_dir,'r'))
     par = Struct(**par)
-    dataset, loader = GetDataset(par, 'train')
+    transform = GetTransform(par, 'train')
+    dataset, loader = GetDataset(par, 'train',transform)
 
     for img, label in loader:
         print(len(label))

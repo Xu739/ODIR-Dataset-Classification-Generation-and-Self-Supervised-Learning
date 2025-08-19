@@ -1,0 +1,49 @@
+# Model Configuration
+model: 'cGAN'  # Model type, choices: ['cGAN', 'DDIM', 'cGANmlp']
+CUDA_VISIBLE_DEVICES: '5'  # GPU device ID to use
+
+# Dataset Paths
+datafile_path: './data'   # Root directory for data files
+img_path: './data/ODIR/ODIR-5K/Training Images'  # Path to training images
+dataset: 'ODIR'           # Options: ['cifar-10', 'ODIR']
+
+# Data Splitting (for cross-validation)
+split_num: 5  # Total number of splits/folds
+split_id: 1  # Current split ID to use (1-based index)
+
+# Image Processing
+img_size: 256  # Input image size (height/width in pixels)
+batch_size: 8  # Number of samples per batch
+num_workers: 32  # Number of subprocesses for data loading
+
+# cGAN-specific Parameters
+is_oversample: 0  # Whether to use oversampling (0=False, 1=True)
+latent_dim: 100  # Dimension of latent space/noise vector
+num_classes: 8  # Number of output classes
+
+# DDIM-specific Parameters (Diffusion Models)
+T: 1000  # Number of diffusion timesteps
+beta_start: 0.0001  # Starting noise level
+beta_end: 0.02  # Ending noise level
+
+# Optimizer Parameters
+lr: 0.0001  # Base learning rate
+optim: "adam"  # Optimizer type, choices: ['adam', 'SGD', 'rsm']
+momentum: 0.9  # Momentum factor (for SGD)
+weight_decay: 0.00001  # L2 regularization weight
+
+# Training Control
+is_resume: 1  # Whether to resume training (0=False, 1=True)
+start_epoch: 138  # Epoch number to start/resume from
+epochs: 1000  # Total number of training epochs
+
+# Learning Rate Scheduler (if used)
+# Note: Scheduler parameters would typically be added here
+# Example:
+# scheduler: 'cosine'
+# min_lr: 0.00001
+# warmup_epochs: 5
+
+# Generator/Discriminator Learning Rates
+d_lr: 0.0001  # Discriminator learning rate (for GANs)
+g_lr: 0.0001  # Generator learning rate (for GANs)
