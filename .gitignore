@@ -1,4 +1,7 @@
 # 数据和模型太大，不上传
+!data/*.py
+!data/*.md
+
 data/*
 checkpoints/
 experiments/logs/
@@ -6,8 +9,7 @@ experiments/logs/
 *.pth
 *.ckpt
 
-!data/*.py
-!data/*.md
+
 
 # 编译后的中间文件
 __pycache__/
