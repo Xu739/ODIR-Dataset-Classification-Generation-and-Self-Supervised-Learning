@@ -372,7 +372,7 @@ if __name__ == '__main__':
             print(f"⚠️ 检测到 {gen_root} 为空，自动调用 DDIM 生成图像...")
             generate_images_ddim_cfg(
                 model.to(device), gen_root,alphas=alphas,alphas_cumprod=alphas_cumprod,Config=args,
-                n_samples_per_class=1000,
+                n_samples_per_class=5000,
                 device=device
             )
         else:
