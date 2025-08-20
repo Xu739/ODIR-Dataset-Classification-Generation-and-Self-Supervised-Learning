@@ -25,20 +25,11 @@ import sys
 from pathlib import Path
 
 
-sys.path.append(str(Path(__file__).parent.parent))
-#Change script path
-root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-os.chdir(root_dir)
-print(root_dir)
-# Import local modules
-from data.dataset_utils import GetTransform,GetDataset
-from src.utils import GetOptim,BestRecorder,GetCriterion, RotSSP
-from experiments.configs.par import Struct
-from src.models.model import GetModel
+
 
 
 # Set wandb to offline mode
-os.environ["WANDB_MODE"] = "offline"
+# os.environ["WANDB_MODE"] = "offline"
 
 
 def train_one_epoch(epoch, train_loader, model, criterion, optimizer):
@@ -202,7 +193,7 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler, c
     return best_recorder.best_result
 
 
-def plot_ovo_confusion_matrix(cm, class_names, figsize=(10, 8), normalize=True,save_dir = None):
+def plot_ovo_confusion_matrix(cm, class_names, figsize=(10, 8), normalize=True,save_dir = None,is_wandb=True):
     """
     Plot a confusion matrix in OVO (One-vs-One) style.
 
@@ -236,7 +227,8 @@ def plot_ovo_confusion_matrix(cm, class_names, figsize=(10, 8), normalize=True,s
     plt.yticks(rotation=0)
 
     # Log to wandb
-    wandb.log({"confusion_matrix_plot": wandb.Image(plt)})
+    if is_wandb:
+        wandb.log({"confusion_matrix_plot": wandb.Image(plt)})
 
     plt.tight_layout()
     plt.show()
@@ -323,6 +315,17 @@ def test(model, test_dataloader, best_result, save_dir, criterion=None, class_na
 
 
 if __name__ == '__main__':
+
+    sys.path.append(str(Path(__file__).parent.parent))
+    # Change script path
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    os.chdir(root_dir)
+    print(root_dir)
+    # Import local modules
+    from data.dataset_utils import GetTransform, GetDataset
+    from src.utils import GetOptim, BestRecorder, GetCriterion, RotSSP
+    from experiments.configs.par import Struct
+    from src.models.model import GetModel
     # Load configuration
     path_yaml = "./experiments/configs/Classification.yaml"
     par = yaml.safe_load(open(path_yaml, 'r'))

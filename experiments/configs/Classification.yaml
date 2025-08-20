@@ -13,13 +13,13 @@ split_num: 5              # Total number of folds for cross-validation
 split_id: 1               # Current fold ID to use (1-based index)
 
 # Data Loading
-batch_size: 32            # Batch size for training/validation
-num_workers: 32           # Number of workers for data loading
-is_oversample: 1          # Whether to use oversampling for class imbalance (0/1)
+batch_size: 20            # Batch size for training/validation
+num_workers: 64           # Number of workers for data loading
+is_oversample: 0          # Whether to use oversampling for class imbalance (0/1)
 
 # Special Training Modes
-is_RotSSP: 0                 # Self-supervised pretraining flag (0/1)
-is_cifar_10: 1            # use CIFAR-10 pretrain specific flag (0/1)
+is_RotSSP: 1                 # Self-supervised pretraining flag (0/1)
+is_cifar_10: 0            # use CIFAR-10 pretrain specific flag (0/1)
 cifar_10_state_dir: '/home/xukaijie/ODIR_project/experiments/log/20250819-170039/checkpoint_53.pth'  # Pretrained model path
 
 # Optimization Parameters
@@ -38,6 +38,6 @@ epochs: 300               # Total number of training epochs
 criterion: 'CrossEntropyLoss'  # Loss function
 
 # System Configuration
-CUDA_VISIBLE_DEVICES: '2,'  # GPU devices to use (comma-separated)
+CUDA_VISIBLE_DEVICES: '5,'  # GPU devices to use (comma-separated)
 seed: 42                   # Random seed for reproducibility
-earlystop: 50              # Early stopping patience (epochs)
+earlystop: 10              # Early stopping patience (epochs)

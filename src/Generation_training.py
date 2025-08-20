@@ -3,7 +3,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-
+import random
 
 import numpy as np
 import torch
@@ -121,6 +121,14 @@ def train_ddim_cfg(model, train_dataloader, val_dataloader, par, save_dir, devic
 
 
 def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
+    def seed_torch(seed=2021):
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.backends.cudnn.deterministic = True
+
+    seed_torch()
     # real label
     real_label = 1.0
     # fake label
@@ -138,7 +146,8 @@ def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
         elif classname.find('BatchNorm') != -1:
             torch.nn.init.normal_(m.weight, 1.0, 0.02)
             torch.nn.init.zeros_(m.bias)
-
+    netD.apply(weights_init)
+    netG.apply(weights_init)
     lb = LabelBinarizer()
     lb.fit(list(range(0, par.num_classes)))
 
@@ -148,13 +157,7 @@ def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
         floatTensor = torch.FloatTensor(y_one_hot)
         return floatTensor.to(device)
 
-    # 样本和one-hot标签进行连接，以此作为条件生成
-    def concanate_data_label(data, y):  # data （N,nc, 128,128）
-        y_one_hot = to_categrical(y)  # (N,1)->(N,n_classes)
 
-        con = torch.cat((data, y_one_hot), 1)
-
-        return con
 
     print('netG:', '\n', netG)
     print('netD:', '\n', netD)
@@ -166,8 +169,8 @@ def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
     criterion = GetCriterion(par,None)
     criterion.to(device)
 
-    optimizerD = optim.Adam(netD.parameters(), lr=par.d_lr)
-    optimizerG = optim.Adam(netG.parameters(), lr=par.g_lr)
+    optimizerD = optim.Adam(netD.parameters(), lr=par.d_lr,betas= (0.5, 0.999))
+    optimizerG = optim.Adam(netG.parameters(), lr=par.g_lr,betas= (0.5, 0.999))
 
 
 
@@ -193,8 +196,7 @@ def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
 
     for epoch in range(start_epoch, 500):
         for batch, (data, target) in enumerate(train_dataloader):
-            #         if epoch%2==0 and batch==0:
-            #             torchvision.utils.save_image(data[:16], filename='./generated_fake/%s/源epoch_%d_grid.png'%(datasets,epoch),nrow=4,normalize=True)
+
             data = data.to(device)
             target = target.to(device)
 
@@ -203,7 +205,7 @@ def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
             target1_ = target1.unsqueeze(2).unsqueeze(3)
             target2 = target1_.repeat(1, 1, data.size(2), data.size(3))  # 加到数据上
             data = torch.cat((data, target2),
-                             dim=1)  # 将标签与数据拼接 (N,nc,128,128),(N,n_classes, 128,128)->(N,nc+nc_classes,128,128)
+                             dim=1)  #  (N,nc,256,256),(N,n_classes, 256,256)->(N,nc+nc_classes,256,2568)
 
             label = torch.full((data.size(0), 1), real_label).to(device)
 
@@ -212,7 +214,7 @@ def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
             netD.zero_grad()
             output = netD(data)
 
-            D_loss = 0
+
 
 
             loss_D1 = criterion(output, label)
@@ -224,7 +226,7 @@ def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
             # 拼接假数据和标签
             fake_data = netG(noise_z)
             # print(fake_data.shape)
-            fake_data = torch.cat((fake_data, target2), dim=1)  # (N,nc+n_classes,128,128)
+            fake_data = torch.cat((fake_data, target2), dim=1)
             label = torch.full((data.size(0), 1), fake_label).to(device)
 
             output = netD(fake_data.detach())
@@ -257,6 +259,9 @@ def train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device):
 
                 print('epoch: %4d, batch: %4d, discriminator loss: %.4f, generator loss: %.4f'
                       % (epoch, batch, loss_D1.item() + loss_D2.item(), lossG.item()))
+
+        # torch.save(model.state_dict(), os.path.join(save_dir, 'model.pth'))
+        torch.save({'netG': netG.state_dict(),'netD': netD.state_dict(),},os.path.join(save_dir, f'model_epoch_{epoch}.pth'))
         noise_z1 = torch.randn(par.num_classes, par.latent_dim, 1).to(device)
         text_labels = torch.tensor([i for i in range(par.num_classes)]).reshape(par.num_classes, ).to(device)
         gen_img_plot(netG, noise_z1, text_labels, par.num_classes, save_dir, device,epoch)

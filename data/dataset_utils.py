@@ -102,7 +102,7 @@ class ImgDataset(Dataset):
         return img, self.labels[idx]
 
 
-def GetDataset(par, data_type, transform=None):
+def GetDataset(par, data_type, transform=None,is_val=False):
     """Factory function to create appropriate dataset and dataloader.
 
     Args:
@@ -114,7 +114,7 @@ def GetDataset(par, data_type, transform=None):
         tuple: (dataset, dataloader) pair
     """
     # Determine if oversampling should be applied
-    is_oversample = (data_type == 'train' and par.is_oversample == 1)
+    is_oversample = (data_type == 'train' and par.is_oversample == 1 and not is_val)
 
     # Handle standard torchvision datasets
     if par.dataset == 'cifar-10':
@@ -189,10 +189,7 @@ def GetTransform(par, type,is_generation=False):
             if type == 'train':
                 transforms = T.Compose([
                     T.Resize((256, 256)),
-                    T.RandomRotation(30),
-                    T.RandomHorizontalFlip(),
-                    T.RandomVerticalFlip(),
-                    T.ColorJitter(brightness=0.2, contrast=0.2),
+
 
                     T.ToTensor(),
                     T.Normalize([0.5] * 3, [0.5] * 3)

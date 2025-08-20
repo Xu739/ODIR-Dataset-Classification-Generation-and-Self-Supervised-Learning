@@ -30,10 +30,10 @@ def GetModel(par,num_classes=None):
         model = GoogleNet(num_classes=ncls)
 
     elif par.model == 'cGAN':
-        model = cGAN(par.latent_dim,par.num_classes,64,64,3 if par.dataset in ['cifar-10','ODIR'] else 1)
+        model = cGAN(par.latent_dim,par.num_classes,64,64,3 )
     elif par.model == 'ddim':
         from models.ddim import UNet
-        model = UNet(par,3 if par.dataset in ['cifar-10','ODIR'] else 1,num_classes=par.num_classes)
+        model = UNet(par,3,num_classes=par.num_classes)
     else:
         model = None
     return model

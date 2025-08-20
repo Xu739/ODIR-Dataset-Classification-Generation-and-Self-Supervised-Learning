@@ -219,9 +219,10 @@ def p_sample_step(model, x_t, t, y, guidance_scale=3.0,T=1000):
 
 
 @torch.no_grad()
-def sample_ddim_cfg(model, label,Config,device,alphas,alphas_cumprod,n_samples=8, sample_steps=50, eta=0.0, guidance_scale=3.0):
+def sample_ddim_cfg(model, label,Config,device,alphas,alphas_cumprod,n_samples=8, sample_steps=50, eta=0.0, guidance_scale=3.0,is_dp=False):
     model.eval()
     shape = (n_samples, 3, Config.img_size, Config.img_size)
+
     img = torch.randn(shape, device=device)
 
     step_size = Config.T // sample_steps
@@ -229,9 +230,10 @@ def sample_ddim_cfg(model, label,Config,device,alphas,alphas_cumprod,n_samples=8
     times_next = [-1] + times[:-1]
 
     for i, j in zip(reversed(times), reversed(times_next)):
+
         t = torch.tensor([i] * n_samples, device=device)
         t_norm = t.float() / Config.T
-        # pred_noise = model(img, t_norm)
+
         pred_noise = p_sample_step(model, img,t, torch.tensor([label] * n_samples).to(device),guidance_scale=guidance_scale)
         alpha = alphas[i]
         alpha_cum = alphas_cumprod[i]

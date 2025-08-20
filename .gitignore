@@ -4,6 +4,7 @@
 data/*
 checkpoints/
 experiments/logs/
+experiments/log/
 *.pt
 *.pth
 *.ckpt

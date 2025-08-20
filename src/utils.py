@@ -35,7 +35,8 @@ def GetOptim(par, model):
         optimizer = torch.optim.Adam(
             model.parameters(),
             lr=par.lr,
-            weight_decay=par.weight_decay
+            weight_decay=par.weight_decay,
+
         )
     elif par.optim == 'SGD':
         optimizer = torch.optim.SGD(

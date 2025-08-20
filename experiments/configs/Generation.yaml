@@ -1,6 +1,6 @@
 # Model Configuration
-model: 'vqvae'  # Model type, choices: ['cGAN', 'ddim','vqvae']
-CUDA_VISIBLE_DEVICES: '0'  # GPU device ID to use
+model: 'cGAN'  # Model type, choices: ['cGAN', 'ddim','vqvae']
+CUDA_VISIBLE_DEVICES: '1'  # GPU device ID to use
 
 # Dataset Paths
 datafile_path: './data'   # Root directory for data files
@@ -12,15 +12,19 @@ split_num: 5  # Total number of splits/folds
 split_id: 1  # Current split ID to use (1-based index)
 
 # Image Processing
-img_size: 128  # Input image size (height/width in pixels)
-batch_size: 8  # Number of samples per batch
+img_size: 256  # Input image size (height/width in pixels)
+batch_size: 32  # Number of samples per batch
 num_workers: 32  # Number of subprocesses for data loading
-is_oversample: 0  # Whether to use oversampling (0=False, 1=True)
+is_oversample: 1  # Whether to use oversampling (0=False, 1=True)
 
 # cGAN-specific Parameters
 latent_dim: 100  # Dimension of latent space/noise vector
 num_classes: 8  # Number of output classes
 criterion: 'BCELoss'#Criterion type, choices: ['BCELoss']
+# Generator/Discriminator Learning Rates
+d_lr: 0.0002  # Discriminator learning rate (for GANs)
+g_lr: 0.0002  # Generator learning rate (for GANs)
+
 
 # DDIM-specific Parameters (Diffusion Models)
 T: 1000  # Number of diffusion timesteps
@@ -58,6 +62,3 @@ scheduler: 'MultistepLR'  # Learning rate scheduler type
 milestones: [50,]         # Epochs at which to adjust LR
 gamma: 0.5                # Factor by which to multiply LR at milestones
 
-# Generator/Discriminator Learning Rates
-d_lr: 0.0001  # Discriminator learning rate (for GANs)
-g_lr: 0.0001  # Generator learning rate (for GANs)
