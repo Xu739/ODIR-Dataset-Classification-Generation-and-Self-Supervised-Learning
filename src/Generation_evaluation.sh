@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to run the model with configurable parameters
-# Usage: ./run_model.sh --model [MODEL_NAME] [OPTIONS]
+
 
 # Default parameters
 #MODEL="cGAN"
@@ -16,7 +16,7 @@
 
 MODEL="ddim"
 NUM_CLASSES=8
-PAR_PATH="./experiments/log/20250820-105330/Generation.yaml"
+PAR_PATH="./experiments/log/20250820-105330/Generation.yaml" #This par aims to get data_path and you can change this to any other Generation.yaml if its dataset is 'ODIR' .
 GEN_ROOT="./data/fake_figure/"
 REAL_ROOT="./data/ODIR/ODIR-5K/Training Images"
 CLASSIFIER_PATH="/home/xukaijie/ODIR_project/checkpoints/resnet_cifar_10_ODIR.pth"
