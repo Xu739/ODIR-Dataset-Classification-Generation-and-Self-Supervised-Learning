@@ -34,4 +34,6 @@ def GetModel(par,num_classes=None):
     elif par.model == 'ddim':
         from models.ddim import UNet
         model = UNet(par,3 if par.dataset in ['cifar-10','ODIR'] else 1,num_classes=par.num_classes)
+    else:
+        model = None
     return model

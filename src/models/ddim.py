@@ -221,7 +221,7 @@ def p_sample_step(model, x_t, t, y, guidance_scale=3.0,T=1000):
 @torch.no_grad()
 def sample_ddim_cfg(model, label,Config,device,alphas,alphas_cumprod,n_samples=8, sample_steps=50, eta=0.0, guidance_scale=3.0):
     model.eval()
-    shape = (n_samples, 3, Config.image_size, Config.image_size)
+    shape = (n_samples, 3, Config.img_size, Config.img_size)
     img = torch.randn(shape, device=device)
 
     step_size = Config.T // sample_steps
@@ -229,10 +229,10 @@ def sample_ddim_cfg(model, label,Config,device,alphas,alphas_cumprod,n_samples=8
     times_next = [-1] + times[:-1]
 
     for i, j in zip(reversed(times), reversed(times_next)):
-        t = torch.tensor([i] * n_samples, device=Config.device)
+        t = torch.tensor([i] * n_samples, device=device)
         t_norm = t.float() / Config.T
         # pred_noise = model(img, t_norm)
-        pred_noise = p_sample_step(model, img,t, torch.tensor([label] * n_samples).to(Config.device),guidance_scale=guidance_scale)
+        pred_noise = p_sample_step(model, img,t, torch.tensor([label] * n_samples).to(device),guidance_scale=guidance_scale)
         alpha = alphas[i]
         alpha_cum = alphas_cumprod[i]
         pred_x0 = (img - torch.sqrt(1 - alpha_cum) * pred_noise) / torch.sqrt(alpha_cum)
@@ -271,7 +271,7 @@ def compute_fid(model, dataloader_real, device,Config, n_samples=5000, sample_st
     fake_images = []
     with torch.no_grad():
         for _ in range(n_samples // dataloader_real.batch_size):
-            z = torch.randn(dataloader_real.batch_size, 3, Config.image_size, Config.image_size, device=device)
+            z = torch.randn(dataloader_real.batch_size, 3, Config.img_size, Config.img_size, device=device)
             t = torch.full((dataloader_real.batch_size,), Config.T-1, device=device)
             t_norm = t.float() / Config.T
             fake = model(z, t_norm).clamp(-1, 1)

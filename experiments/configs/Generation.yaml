@@ -1,6 +1,6 @@
 # Model Configuration
-model: 'ddim'  # Model type, choices: ['cGAN', 'ddim',]
-CUDA_VISIBLE_DEVICES: '4'  # GPU device ID to use
+model: 'vqvae'  # Model type, choices: ['cGAN', 'ddim','vqvae']
+CUDA_VISIBLE_DEVICES: '0'  # GPU device ID to use
 
 # Dataset Paths
 datafile_path: './data'   # Root directory for data files
@@ -15,7 +15,7 @@ split_id: 1  # Current split ID to use (1-based index)
 img_size: 128  # Input image size (height/width in pixels)
 batch_size: 8  # Number of samples per batch
 num_workers: 32  # Number of subprocesses for data loading
-is_oversample: 1  # Whether to use oversampling (0=False, 1=True)
+is_oversample: 0  # Whether to use oversampling (0=False, 1=True)
 
 # cGAN-specific Parameters
 latent_dim: 100  # Dimension of latent space/noise vector
@@ -28,6 +28,18 @@ beta_start: 0.0001  # Starting noise level
 beta_end: 0.02  # Ending noise level
 debug_shapes: False #debug UNet shape
 drop_prob : 0.1
+
+# VQVAE-Transformer-specific Parameters
+codebook_size: 512
+D : 256
+gpt_d_model: 512
+gpt_layers: 8
+gpt_heads: 8
+gpt_dropout: 0.1
+seq_len: 256
+temperature: 1.0
+top_k: 64
+num_samples: 16
 
 
 # Optimizer Parameters

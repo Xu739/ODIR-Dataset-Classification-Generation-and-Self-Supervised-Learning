@@ -13,8 +13,8 @@ from sklearn.preprocessing import LabelBinarizer
 from torch import nn, optim
 import yaml
 from torchvision import utils
-
-
+from tqdm import tqdm
+import torch.nn.functional as F
 global device
 
 os.environ["WANDB_MODE"] = "offline"
@@ -25,11 +25,50 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 os.chdir(root_dir)
 print(root_dir)
 from src.models.model import GetModel
+from src.models.vqvae_transformer import VQVAE, TokenTransformer, save_image_grid, train_vqvae, train_transformer, sample_images
 from src.models.ddim import q_sample, compute_fid, sample_ddim_cfg, linear_beta_schedule
 from experiments.configs.par import Struct
 from src.utils import GetCriterion,GetOptim
 
 from data.dataset_utils import GetDataset, GetTransform
+
+
+
+def train_vqvae_transformer(model, train_dataloader, val_dataloader, par, save_dir, device):
+    # ----------------------------
+    # train vqvae
+    # ----------------------------
+
+    vqvae = VQVAE(codebook_size=par.codebook_size,D = par.D).to(device)
+
+    optim_vqvae, _ = GetOptim(par,vqvae)
+
+    train_vqvae(vqvae, train_dataloader, optim_vqvae, save_dir, par, device)
+
+    # ----------------------------
+    # train transformer
+    # ---------------------------
+
+    vq_state = torch.load(os.path.join(save_dir, 'vqvae_best.pt'))
+    vqvae.load_state_dict(vq_state)
+    vqvae.eval()
+
+    gpt = TokenTransformer(vocab_size=par.codebook_size, seq_len=par.seq_len,
+                           d_model=par.gpt_d_model, n_head=par.gpt_heads,
+                           n_layer=par.gpt_layers, dropout=par.gpt_dropout).to(device)
+    optim_gpt = torch.optim.AdamW(gpt.parameters(), lr=par.lr, betas=(0.9, 0.95), weight_decay=0.01)
+
+    train_transformer(vqvae, gpt, train_dataloader, optim_gpt, save_dir, par, device)
+
+
+    # ----------------------------
+    # sampling
+    # ---------------------------
+
+    sample_images(None,None,save_dir,True)
+
+
+
 def train_ddim_cfg(model, train_dataloader, val_dataloader, par, save_dir, device):
     betas = linear_beta_schedule(par.T)
     alphas = 1.0 - betas
@@ -259,3 +298,5 @@ if __name__ == '__main__':
         train_cGAN(model, train_dataloader, val_dataloader, par, save_dir, device)
     elif par.model in ['ddim']:
         train_ddim_cfg(model.to(device), train_dataloader, val_dataloader, par, save_dir, device)
+    elif par.model in ['vqvae']:
+        train_vqvae_transformer(model, train_dataloader, val_dataloader, par, save_dir, device)

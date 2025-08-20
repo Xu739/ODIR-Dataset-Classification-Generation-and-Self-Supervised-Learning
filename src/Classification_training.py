@@ -353,6 +353,7 @@ if __name__ == '__main__':
 
     # Load pretrained weights if specified
     if par.is_cifar_10 == 1:
+        print('cifar-10 pretrained')
         new_state_dict = model.state_dict()
         cifar_10_state = torch.load(par.cifar_10_state_dir)
         for name, param in cifar_10_state.items():
